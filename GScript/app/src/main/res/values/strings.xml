@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">GScript</string>
+
+    <!-- MainActivity -->
+    <string name="code_hint">Insert GolfScript code</string>
+
+    <string name="action_run_title">Run</string>
+    <string name="action_clear_title">Clear</string>
+    <string name="action_save_title">Save</string>
+    <string name="action_load_title">Load</string>
+
+    <!-- OutputActivity -->
+    <string name="output_hint"></string>
+    <string name="title_activity_output">Output</string>
+</resources>
