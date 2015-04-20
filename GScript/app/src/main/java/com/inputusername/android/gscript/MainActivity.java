@@ -1,5 +1,6 @@
 package com.inputusername.android.gscript;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toolbar;
 
 public class MainActivity extends Activity {
     public final static String EXTRA_OUTPUT = "GS_OUTPUT";
@@ -32,7 +34,7 @@ public class MainActivity extends Activity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(PREF_SAVED_CODE, getCodeEditText().getText().toString());
-        editor.commit();
+        editor.apply();
     }
 
     @Override
@@ -52,10 +54,8 @@ public class MainActivity extends Activity {
                 clearCode();
                 return true;
             case R.id.action_save:
-
             default:
                 return true;
-
         }
     }
 

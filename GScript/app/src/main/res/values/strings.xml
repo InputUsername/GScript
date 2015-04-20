@@ -10,6 +10,9 @@
     <string name="action_load_title">Load</string>
 
     <!-- OutputActivity -->
-    <string name="output_hint"></string>
     <string name="title_activity_output">Output</string>
+
+    <string name="output_hint"></string>
+
+    <string name="share_title">Share code</string>
 </resources>

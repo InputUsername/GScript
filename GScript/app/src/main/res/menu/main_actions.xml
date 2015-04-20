@@ -8,10 +8,4 @@
         android:title="@string/action_clear_title"
         android:icon="@drawable/icon_clear"
         android:showAsAction="ifRoom" />
-    <item android:id="@+id/action_save"
-        android:title="@string/action_save_title"
-        android:showAsAction="never" />
-    <item android:id="@+id/action_load"
-        android:title="@string/action_load_title"
-        android:showAsAction="never" />
 </menu>
