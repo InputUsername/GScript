@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toolbar;
 
+import com.inputusername.android.gscript.lang.Interpreter;
+
 public class MainActivity extends Activity {
     public final static String EXTRA_OUTPUT = "GS_OUTPUT";
 
@@ -53,7 +55,6 @@ public class MainActivity extends Activity {
             case R.id.action_clear:
                 clearCode();
                 return true;
-            case R.id.action_save:
             default:
                 return true;
         }
@@ -64,8 +65,8 @@ public class MainActivity extends Activity {
     }
 
     void runCode() {
-        //TODO: implement this
-        String output = "This is some temporary test output";
+        String code = getCodeEditText().getText().toString();
+        String output = Interpreter.interpret(code);
 
         Intent intent = new Intent(this, OutputActivity.class);
         intent.putExtra(EXTRA_OUTPUT, output);
