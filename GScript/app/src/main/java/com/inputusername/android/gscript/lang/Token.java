@@ -23,16 +23,16 @@ public class Token {
     }
 
     private static Type findTokenType(String token) {
-        if (token.matches("/[a-zA-Z_][a-zA-Z0-9_]*/")) {
+        if (token.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
             return Type.WORD;
         }
-        else if (token.matches("/-?[0-9]+/")) {
+        else if (token.matches("-?[0-9]+")) {
             return Type.NUMBER;
         }
         else if (token.startsWith("{") && token.endsWith("}")) {
             return Type.BLOCK;
         }
-        else if (token.matches("/'(?:\\.|[^'])*'?/") || token.matches("/\"(?:\\.|[^\"])*\"?/")) {
+        else if (token.matches("'(?:\\.|[^'])*'?") || token.matches("\"(?:\\.|[^\"])*\"?")) {
             return Type.STRING;
         }
         else if (token.startsWith("#")) {

@@ -27,7 +27,7 @@ public class GsArray implements GsObject {
 
         for (int i = 0; i < size; ++i) {
             result.append(data.get(i).toString());
-            result.append(" ");
+            result.append(", ");
         }
         result.replace(size - 1, size, "]");
 

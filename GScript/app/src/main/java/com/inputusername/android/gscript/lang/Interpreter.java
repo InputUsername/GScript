@@ -3,13 +3,12 @@ package com.inputusername.android.gscript.lang;
 import com.inputusername.android.gscript.lang.types.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Interpreter {
     private final static int maxRecursionDepth = 50;
 
-    private static String interpretString(String code, Stack stack, Namespace variables, int recursionDepth) {
-        StringBuilder output = new StringBuilder();
-
+    private static String interpretString(String code, Functions functions, StringBuilder output, Stack stack, Namespace variables, int recursionDepth) {
         ArrayList<Token> tokens = Tokenizer.tokenize(code);
         int tokenCount = tokens.size();
 
@@ -28,12 +27,10 @@ public class Interpreter {
                         String nextTokenString = nextToken.getTokenString();
 
                         variables.put(nextTokenString, value);
-                    }
-                    else {
+                    } else {
                         //TODO: implement exceptions (end of code reached during assignment)
                     }
-                }
-                else {
+                } else {
                     //TODO: implement exceptions (stack empty)
                 }
 
@@ -48,17 +45,14 @@ public class Interpreter {
                 GsObject object = variables.get(tokenString);
                 if ((object instanceof GsNumber) || (object instanceof GsString) || (object instanceof GsArray)) {
                     stack.push(object);
-                }
-                else if (object instanceof GsBlock) {
+                } else if (object instanceof GsBlock) {
                     if (recursionDepth < maxRecursionDepth) {
-                        String blockCode = ((GsBlock)object).getData();
-                        interpretString(blockCode, stack, variables, ++recursionDepth);
-                    }
-                    else {
+                        String blockCode = ((GsBlock) object).getData();
+                        interpretString(blockCode, functions, output, stack, variables, ++recursionDepth);
+                    } else {
                         //TODO: implement exceptions (max recursion depth reached)
                     }
-                }
-                else {
+                } else {
                     //TODO: implement exceptions (unknown object type)
                 }
 
@@ -86,26 +80,32 @@ public class Interpreter {
             else if (tokenType == Token.Type.COMMENT) {
                 // Do nothing! :O
             }
-            else if (tokenType == Token.Type.WORD) {
+            else if (tokenType == Token.Type.WORD || tokenType == Token.Type.OTHER) {
                 if (BuiltIn.exists(tokenString)) {
+                    functions.execute(tokenString);
                 }
-            }
-            else if (tokenType == Token.Type.OTHER) {
-
             }
         }
 
-        return output.toString();
+        Iterator<GsObject> iterator = stack.descendingIterator();
+        while (iterator.hasNext()) {
+            output.append(", ");
+            output.append(iterator.next().toString());
+        }
+
+        return output.substring(2);
     }
 
     public static String interpret(String program) {
         Stack stack = new Stack();
         Namespace variables = new Namespace();
+        StringBuilder output = new StringBuilder();
+        Functions functionsList = new Functions(stack, output);
 
         String result;
 
         try {
-            result = interpretString(program, stack, variables, 0);
+            result = interpretString(program, functionsList, output, stack, variables, 0);
         }
         catch (Exception e) {
             result = e.getMessage();
