@@ -21,15 +21,21 @@ public class GsArray implements GsObject {
         data.set(index, object);
     }
 
+    public List<GsObject> getData() {
+        return data;
+    }
+
     public String toString() {
         StringBuilder result = new StringBuilder("[");
         int size = data.size();
 
         for (int i = 0; i < size; ++i) {
             result.append(data.get(i).toString());
-            result.append(", ");
+            result.append(" ");
         }
-        result.replace(size - 1, size, "]");
+
+        int resultLength = result.length();
+        result.replace(resultLength - 1, resultLength, "]");
 
         return result.toString();
     }

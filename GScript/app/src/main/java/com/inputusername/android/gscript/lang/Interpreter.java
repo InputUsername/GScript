@@ -9,6 +9,10 @@ public class Interpreter {
     private final static int maxRecursionDepth = 50;
 
     private static String interpretString(String code, Functions functions, StringBuilder output, Stack stack, Namespace variables, int recursionDepth) {
+        if (recursionDepth == maxRecursionDepth) {
+            //TODO: implement exceptions (max recursion depth)
+        }
+
         ArrayList<Token> tokens = Tokenizer.tokenize(code);
         int tokenCount = tokens.size();
 
@@ -19,19 +23,15 @@ public class Interpreter {
 
             // Handle assignment and go to the next token.
             if (tokenString.equals(":")) {
-                if (!stack.isEmpty()) {
-                    GsObject value = stack.peek();
+                GsObject value = stack.peek();
 
-                    if (i != tokenCount - 1) {
-                        Token nextToken = tokens.get(i + 1);
-                        String nextTokenString = nextToken.getTokenString();
+                if (i != tokenCount - 1) {
+                    Token nextToken = tokens.get(i + 1);
+                    String nextTokenString = nextToken.getTokenString();
 
-                        variables.put(nextTokenString, value);
-                    } else {
-                        //TODO: implement exceptions (end of code reached during assignment)
-                    }
+                    variables.put(nextTokenString, value);
                 } else {
-                    //TODO: implement exceptions (stack empty)
+                    //TODO: implement exceptions (end of code reached during assignment)
                 }
 
                 // Move to next token and then continue the loop, so actually skip the next token.
@@ -46,12 +46,8 @@ public class Interpreter {
                 if ((object instanceof GsNumber) || (object instanceof GsString) || (object instanceof GsArray)) {
                     stack.push(object);
                 } else if (object instanceof GsBlock) {
-                    if (recursionDepth < maxRecursionDepth) {
-                        String blockCode = ((GsBlock) object).getData();
-                        interpretString(blockCode, functions, output, stack, variables, ++recursionDepth);
-                    } else {
-                        //TODO: implement exceptions (max recursion depth reached)
-                    }
+                    String blockCode = ((GsBlock) object).getData();
+                    interpretString(blockCode, functions, output, stack, variables, ++recursionDepth);
                 } else {
                     //TODO: implement exceptions (unknown object type)
                 }

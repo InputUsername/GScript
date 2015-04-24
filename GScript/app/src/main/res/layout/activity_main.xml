@@ -17,11 +17,10 @@
         android:ems="10"
         android:id="@+id/editText_Code"
         android:typeface="monospace"
-        android:gravity="top|left"
+        android:gravity="top|start"
         android:hint="@string/code_hint"
         android:fontFamily="monospace"
-        android:background="@null"
-        android:imeOptions="flagNoExtractUi" />
+        android:background="@null" />
 
 
 </LinearLayout>

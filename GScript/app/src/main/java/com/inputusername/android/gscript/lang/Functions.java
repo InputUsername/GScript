@@ -1,7 +1,10 @@
 package com.inputusername.android.gscript.lang;
 
 import com.inputusername.android.gscript.lang.types.GsArray;
+import com.inputusername.android.gscript.lang.types.GsBlock;
+import com.inputusername.android.gscript.lang.types.GsNumber;
 import com.inputusername.android.gscript.lang.types.GsObject;
+import com.inputusername.android.gscript.lang.types.GsString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +14,14 @@ import java.util.List;
  */
 public class Functions {
 
-    private Stack programStack;
-    private StringBuilder programOutput;
+    private Stack stack;
+    private StringBuilder output;
 
     private int stackSize = -1;
 
     public Functions(Stack stack, StringBuilder output) {
-        programStack = stack;
-        programOutput = output;
+        this.stack = stack;
+        this.output = output;
     }
 
     public void execute(String builtIn) {
@@ -158,17 +161,19 @@ public class Functions {
     }
 
     private void logicalNot() {
-
+        GsObject object = stack.pop();
+        int logicalValue = (Util.truthy(object) ? 0 : 1);
+        stack.push(new GsNumber(logicalValue));
     }
 
     private void rotate() {
-        GsObject first = programStack.pop(),
-                second = programStack.pop(),
-                third = programStack.pop();
+        GsObject first = stack.pop(),
+                second = stack.pop(),
+                third = stack.pop();
 
-        programStack.push(third);
-        programStack.push(first);
-        programStack.push(second);
+        stack.push(third);
+        stack.push(first);
+        stack.push(second);
     }
 
     private void stackIth_sortBy() {
@@ -208,19 +213,19 @@ public class Functions {
     }
 
     private void arrayStart() {
-        stackSize = programStack.size();
+        stackSize = stack.size();
     }
 
     private void arrayEnd() {
         if (stackSize != -1) {
-            int arrayCount = programStack.size() - stackSize;
+            int arrayCount = stack.size() - stackSize;
             List<GsObject> objects = new ArrayList<>();
 
-            for (int i = arrayCount; i > 0; --i) {
-                objects.add(programStack.pop());
+            for (int i = 0; i < arrayCount; ++i) {
+                objects.add(stack.pop());
             }
             GsArray newArray = new GsArray(objects);
-            programStack.push(newArray);
+            stack.push(newArray);
 
             stackSize = -1;
         }
@@ -230,13 +235,13 @@ public class Functions {
     }
 
     private void swap() {
-        GsObject first = programStack.pop(), second = programStack.pop();
-        programStack.push(first);
-        programStack.push(second);
+        GsObject first = stack.pop(), second = stack.pop();
+        stack.push(first);
+        stack.push(second);
     }
 
     private void pop() {
-        programStack.pop();
+        stack.pop();
     }
 
     private void lessThan_elementsLessThanIndex() {
@@ -252,11 +257,22 @@ public class Functions {
     }
 
     private void range_size_select() {
+        GsObject object = stack.pop();
 
+        if (object instanceof GsNumber) {
+            int number = ((GsNumber)object).getData();
+            List<GsObject> newArrayData = new ArrayList<>();
+
+            for (int i = 0; i < number; i++) {
+                newArrayData.add(new GsNumber(i));
+            }
+
+            stack.push(new GsArray(newArrayData));
+        }
     }
 
     private void dup() {
-        programStack.push(programStack.peek());
+        stack.push(stack.peek());
     }
 
     private void pow_index_find() {
@@ -264,11 +280,37 @@ public class Functions {
     }
 
     private void decrement_uncons() {
+        GsObject object = stack.pop();
 
+        if (object instanceof GsNumber) {
+            int number = ((GsNumber)object).getData();
+            stack.push(new GsNumber(number - 1));
+        }
+        else if (object instanceof GsArray) {
+            GsArray array = (GsArray)object;
+            List<GsObject> arrayData = array.getData();
+            GsObject leftObject = arrayData.get(0);
+            GsArray newArray = new GsArray(arrayData.subList(1, arrayData.size()));
+            stack.push(newArray);
+            stack.push(leftObject);
+        }
     }
 
     private void increment_rightUncons() {
+        GsObject object = stack.pop();
 
+        if (object instanceof GsNumber) {
+            int number = ((GsNumber)object).getData();
+            stack.push(new GsNumber(number + 1));
+        }
+        else if (object instanceof GsArray) {
+            GsArray array = (GsArray)object;
+            List<GsObject> arrayData = array.getData();
+            GsObject leftObject = arrayData.get(arrayData.size() - 1);
+            GsArray newArray = new GsArray(arrayData.subList(0, arrayData.size() - 2));
+            stack.push(newArray);
+            stack.push(leftObject);
+        }
     }
 
     private void and() {
@@ -284,27 +326,47 @@ public class Functions {
     }
 
     private void print() {
-
+        GsObject object = stack.pop();
+        if (object instanceof GsString) {
+            stack.push(object);
+        }
+        else {
+            GsString string = new GsString(object.toString());
+            stack.push(string);
+        }
     }
 
     private void p() {
-
+        inspect();
+        puts();
     }
 
     private void n() {
-
+        stack.push(new GsString("\n"));
     }
 
     private void puts() {
-
+        print();
+        n();
+        print();
     }
 
     private void rand() {
+        GsObject object = stack.pop();
 
+        if (object instanceof GsNumber) {
+            int number = ((GsNumber)object).getData();
+            int random = (int)(Math.random() * number);
+            stack.push(new GsNumber(random));
+        }
     }
 
     private void doFunc() {
+        GsObject object = stack.pop();
 
+        if (object instanceof GsBlock) {
+
+        }
     }
 
     private void whileFunc() {
@@ -316,11 +378,33 @@ public class Functions {
     }
 
     private void ifFunc() {
+        GsObject ifFalse = stack.pop(),
+                ifTrue = stack.pop(),
+                condition = stack.pop();
 
+        if (Util.truthy(condition)) {
+            if (ifTrue instanceof GsBlock) {
+                //TODO: finish 'if' builtin
+            }
+            else {
+                stack.push(ifTrue);
+            }
+        }
+        else {
+
+        }
     }
 
     private void abs() {
+        GsObject object = stack.pop();
 
+        if (object instanceof GsNumber) {
+            int number = Math.abs(((GsNumber)object).getData());
+            stack.push(new GsNumber(number));
+        }
+        else {
+            //TODO: implement exceptions (incorrect data type for abs)
+        }
     }
 
     private void zip() {
