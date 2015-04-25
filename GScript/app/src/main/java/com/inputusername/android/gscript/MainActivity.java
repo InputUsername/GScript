@@ -55,6 +55,9 @@ public class MainActivity extends Activity {
             case R.id.action_clear:
                 clearCode();
                 return true;
+            case R.id.action_help:
+                showHelp();
+                return true;
             default:
                 return true;
         }
@@ -79,6 +82,11 @@ public class MainActivity extends Activity {
     void clearCode() {
         EditText editTextCode = getCodeEditText();
         editTextCode.setText("");
+    }
+
+    void showHelp() {
+        Intent intent = new Intent(this, HelpActivity.class);
+        startActivity(intent);
     }
 
 }

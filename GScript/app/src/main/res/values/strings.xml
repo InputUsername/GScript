@@ -12,4 +12,8 @@
     <string name="title_activity_output">Output</string>
 
     <string name="output_hint"></string>
+    <string name="title_activity_help">HelpActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>
