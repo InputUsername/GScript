@@ -152,7 +152,8 @@ public class Functions {
         }
     }
 
-    private void bitwiseNot_dump_eval() {
+    @PartiallyImplemented
+    public void bitwiseNot_dump_eval() {
         GsObject object = stack.pop();
 
         if (Util.isNumber(object)) {
@@ -160,7 +161,7 @@ public class Functions {
             stack.push(new GsNumber(~number));
         }
         else if (Util.isString(object) || Util.isBlock(object)) {
-
+            //TODO: string/block eval
         }
         else if (Util.isArray(object)) {
             List<GsObject> arrayData = ((GsArray)object).getData();
@@ -170,18 +171,18 @@ public class Functions {
         }
     }
 
-    private void inspect() {
+    public void inspect() {
         GsObject object = stack.pop();
         stack.push(new GsString(object.toString()));
     }
 
-    private void logicalNot() {
+    public void logicalNot() {
         GsObject object = stack.pop();
         int logicalValue = (Util.truthy(object) ? 0 : 1);
         stack.push(new GsNumber(logicalValue));
     }
 
-    private void rotate() {
+    public void rotate() {
         GsObject first = stack.pop(),
                 second = stack.pop(),
                 third = stack.pop();
@@ -191,47 +192,104 @@ public class Functions {
         stack.push(second);
     }
 
-    private void stackIth_sortBy() {
+    @Unimplemented
+    public void stackIth_sortBy() {
 
     }
 
-    private void add_concat() {
+    @Unimplemented
+    public void add_concat() {
 
     }
 
-    private void subtract_setDiff() {
+    @Unimplemented
+    public void subtract_setDiff() {
 
     }
 
-    private void mult_blockExecuteTimes_arrayRepeat_join_fold() {
+    @Unimplemented
+    public void mult_blockExecuteTimes_arrayRepeat_join_fold() {
 
     }
 
-    private void div_split_splitInGroupsOfSize_unfold_each() {
+    @Unimplemented
+    public void div_split_splitInGroupsOfSize_unfold_each() {
 
     }
 
-    private void mod_map_everyIthElement_cleanSplit() {
+    @PartiallyImplemented
+    public void mod_map_everyIthElement_cleanSplit() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.isNumber(first) && Util.isNumber(second)) {
+            int firstNumber = ((GsNumber)first).getData(),
+                    secondNumber = ((GsNumber)second).getData();
+
+            int mod = secondNumber % firstNumber;
+            stack.push(new GsNumber(mod));
+        }
+        else {
+            //TODO: finish 'mod map everyIthElement cleanSplit' builtin
+        }
     }
 
-    private void bitwiseOr_setwiseOr() {
+    @PartiallyImplemented
+    public void bitwiseOr_setwiseOr() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.isNumber(first) && Util.isNumber(second)) {
+            int firstNumber = ((GsNumber)first).getData(),
+                    secondNumber = ((GsNumber)second).getData();
+
+            int bitwiseOr = firstNumber | secondNumber;
+            stack.push(new GsNumber(bitwiseOr));
+        }
+        else {
+            //TODO: finish 'bitwise or/setwise or' builtin
+        }
     }
 
-    private void bitwiseAnd_setwiseAnd() {
+    @PartiallyImplemented
+    public void bitwiseAnd_setwiseAnd() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.isNumber(first) && Util.isNumber(second)) {
+            int firstNumber = ((GsNumber)first).getData(),
+                    secondNumber = ((GsNumber)second).getData();
+
+            int bitwiseAnd = firstNumber & secondNumber;
+            stack.push(new GsNumber(bitwiseAnd));
+        }
+        else {
+            //TODO: finish 'bitwise and/setwise and' builtin
+        }
     }
 
-    private void bitwiseXor_setwiseXor() {
+    @PartiallyImplemented
+    public void bitwiseXor_setwiseXor() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.isNumber(first) && Util.isNumber(second)) {
+            int firstNumber = ((GsNumber)first).getData(),
+                    secondNumber = ((GsNumber)second).getData();
+
+            int bitwiseXor = firstNumber ^ secondNumber;
+            stack.push(new GsNumber(bitwiseXor));
+        }
+        else {
+            //TODO: finish 'bitwise xor/setwise xor' builtin
+        }
     }
 
-    private void arrayStart() {
+    public void arrayStart() {
         stackSize = stack.size();
     }
 
-    private void arrayEnd() {
+    public void arrayEnd() {
         int arrayCount = stack.size() - stackSize;
         List<GsObject> objects = new ArrayList<>();
 
@@ -244,29 +302,46 @@ public class Functions {
         stackSize = 0;
     }
 
-    private void swap() {
+    public void swap() {
         GsObject first = stack.pop(), second = stack.pop();
         stack.push(first);
         stack.push(second);
     }
 
-    private void pop() {
+    public void pop() {
         stack.pop();
     }
 
-    private void lessThan_elementsLessThanIndex() {
+    @Unimplemented
+    public void lessThan_elementsLessThanIndex() {
 
     }
 
-    private void greaterThan_elementsGreaterThanOrEqualToIndex() {
+    @Unimplemented
+    public void greaterThan_elementsGreaterThanOrEqualToIndex() {
 
     }
 
-    private void equalTo_elementAtIndex() {
+    @PartiallyImplemented
+    public void equalTo_elementAtIndex() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (first.getClass().equals(second.getClass())) {
+            if (Util.areEqual(first, second)) {
+                stack.push(new GsNumber(1));
+            }
+            else {
+                stack.push(new GsNumber(0));
+            }
+        }
+        else {
+            //TODO: array/string/block index
+        }
     }
 
-    private void range_size_select() {
+
+    public void range_size_select() {
         GsObject object = stack.pop();
 
         if (Util.isNumber(object)) {
@@ -281,15 +356,48 @@ public class Functions {
         }
     }
 
-    private void dup() {
+    public void dup() {
         stack.push(stack.peek());
     }
 
-    private void pow_index_find() {
+    @PartiallyImplemented
+    public void pow_index_find() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.isNumber(first) && Util.isNumber(second)) {
+            int firstNumber = ((GsNumber)first).getData(),
+                    secondNumber = ((GsNumber)second).getData();
+
+            int power = (int)Math.pow((double)secondNumber, (double)firstNumber);
+            stack.push(new GsNumber(power));
+        }
+        else if (Util.isArray(first) || Util.isArray(second)) {
+            GsObject needle = null;
+            List<GsObject> haystack = null;
+
+            if (Util.isArray(first)) {
+                needle = second;
+                haystack = ((GsArray)first).getData();
+            }
+            else if (Util.isArray(second)) {
+                needle = first;
+                haystack = ((GsArray)second).getData();
+            }
+
+            if (needle == null || haystack == null) {
+                return;
+            }
+
+            int index = haystack.indexOf(needle);
+            stack.push(new GsNumber(index));
+        }
+        else {
+            //TODO: find
+        }
     }
 
-    private void decrement_uncons() {
+    public void decrement_uncons() {
         GsObject object = stack.pop();
 
         if (Util.isNumber(object)) {
@@ -306,7 +414,7 @@ public class Functions {
         }
     }
 
-    private void increment_rightUncons() {
+    public void increment_rightUncons() {
         GsObject object = stack.pop();
 
         if (Util.isNumber(object)) {
@@ -317,25 +425,28 @@ public class Functions {
             GsArray array = (GsArray)object;
             List<GsObject> arrayData = array.getData();
             GsObject leftObject = arrayData.get(arrayData.size() - 1);
-            GsArray newArray = new GsArray(arrayData.subList(0, arrayData.size() - 2));
+            GsArray newArray = new GsArray(arrayData.subList(0, arrayData.size() - 1));
             stack.push(newArray);
             stack.push(leftObject);
         }
     }
 
-    private void and() {
+    @Unimplemented
+    public void and() {
 
     }
 
-    private void or() {
+    @Unimplemented
+    public void or() {
 
     }
 
-    private void xor() {
+    @Unimplemented
+    public void xor() {
 
     }
 
-    private void print() {
+    public void print() {
         GsObject object = stack.pop();
         if (Util.isString(object)) {
             stack.push(object);
@@ -346,22 +457,22 @@ public class Functions {
         }
     }
 
-    private void p() {
+    public void p() {
         inspect();
         puts();
     }
 
-    private void n() {
+    public void n() {
         stack.push(new GsString("\n"));
     }
 
-    private void puts() {
+    public void puts() {
         print();
         n();
         print();
     }
 
-    private void rand() {
+    public void rand() {
         GsObject object = stack.pop();
 
         if (Util.isNumber(object)) {
@@ -371,23 +482,27 @@ public class Functions {
         }
     }
 
-    private void doFunc() {
+    @Unimplemented
+    public void doFunc() {
         GsObject object = stack.pop();
 
         if (Util.isBlock(object)) {
-
+            //TODO: finish 'do' builtin
         }
     }
 
-    private void whileFunc() {
+    @Unimplemented
+    public void whileFunc() {
 
     }
 
-    private void until() {
+    @Unimplemented
+    public void until() {
 
     }
 
-    private void ifFunc() {
+    @Unimplemented
+    public void ifFunc() {
         GsObject ifFalse = stack.pop(),
                 ifTrue = stack.pop(),
                 condition = stack.pop();
@@ -405,23 +520,22 @@ public class Functions {
         }
     }
 
-    private void abs() {
+    public void abs() {
         GsObject object = stack.pop();
 
         if (Util.isNumber(object)) {
             int number = Math.abs(((GsNumber)object).getData());
             stack.push(new GsNumber(number));
         }
-        else {
-            //TODO: implement exceptions (incorrect data type for abs)
-        }
     }
 
-    private void zip() {
+    @Unimplemented
+    public void zip() {
 
     }
 
-    private void base() {
+    @Unimplemented
+    public void base() {
 
     }
 
