@@ -446,6 +446,7 @@ public class Functions {
 
     }
 
+    //region TODO: fix output and string escapes and such
     public void print() {
         GsObject object = stack.pop();
         if (Util.isString(object)) {
@@ -471,6 +472,7 @@ public class Functions {
         n();
         print();
     }
+    //endregion
 
     public void rand() {
         GsObject object = stack.pop();
