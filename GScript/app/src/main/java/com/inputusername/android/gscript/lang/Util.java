@@ -10,25 +10,25 @@ public class Util {
     public static boolean truthy(GsObject object) {
         boolean truthy = true;
 
-        if (object instanceof GsNumber) {
+        if (isNumber(object)) {
             GsNumber number = (GsNumber)object;
             if (number.getData() == 0) {
                 truthy = false;
             }
         }
-        else if (object instanceof GsString) {
+        else if (isString(object)) {
             GsString string = (GsString)object;
             if (string.getData().isEmpty()) {
                 truthy = false;
             }
         }
-        else if (object instanceof GsBlock) {
+        else if (isBlock(object)) {
             GsBlock block = (GsBlock)object;
             if (block.getData().isEmpty()) {
                 truthy = false;
             }
         }
-        else if (object instanceof GsArray) {
+        else if (isArray(object)) {
             GsArray array = (GsArray)object;
             if (array.getData().isEmpty()) {
                 truthy = false;
@@ -52,5 +52,10 @@ public class Util {
 
     public static boolean isArray(GsObject object) {
         return (object instanceof GsArray);
+    }
+
+    public static GsObject[] coerce(GsObject first, GsObject second) {
+        GsObject[] objects = new GsObject[2];
+        return objects;
     }
 }

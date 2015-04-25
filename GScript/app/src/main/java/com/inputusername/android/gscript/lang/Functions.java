@@ -17,7 +17,7 @@ public class Functions {
     private Stack stack;
     private StringBuilder output;
 
-    private int stackSize = -1;
+    private int stackSize = 0;
 
     public Functions(Stack stack, StringBuilder output) {
         this.stack = stack;
@@ -153,11 +153,26 @@ public class Functions {
     }
 
     private void bitwiseNot_dump_eval() {
+        GsObject object = stack.pop();
 
+        if (Util.isNumber(object)) {
+            int number = ((GsNumber)object).getData();
+            stack.push(new GsNumber(~number));
+        }
+        else if (Util.isString(object) || Util.isBlock(object)) {
+
+        }
+        else if (Util.isArray(object)) {
+            List<GsObject> arrayData = ((GsArray)object).getData();
+            for (GsObject arrayObject : arrayData) {
+                stack.push(arrayObject);
+            }
+        }
     }
 
     private void inspect() {
-
+        GsObject object = stack.pop();
+        stack.push(new GsString(object.toString()));
     }
 
     private void logicalNot() {
@@ -217,21 +232,16 @@ public class Functions {
     }
 
     private void arrayEnd() {
-        if (stackSize != -1) {
-            int arrayCount = stack.size() - stackSize;
-            List<GsObject> objects = new ArrayList<>();
+        int arrayCount = stack.size() - stackSize;
+        List<GsObject> objects = new ArrayList<>();
 
-            for (int i = 0; i < arrayCount; ++i) {
-                objects.add(stack.pop());
-            }
-            GsArray newArray = new GsArray(objects);
-            stack.push(newArray);
+        for (int i = 0; i < arrayCount; ++i) {
+            objects.add(0, stack.pop());
+        }
+        GsArray newArray = new GsArray(objects);
+        stack.push(newArray);
 
-            stackSize = -1;
-        }
-        else {
-            //TODO: implement exceptions (stackSize not set)
-        }
+        stackSize = 0;
     }
 
     private void swap() {
@@ -259,7 +269,7 @@ public class Functions {
     private void range_size_select() {
         GsObject object = stack.pop();
 
-        if (object instanceof GsNumber) {
+        if (Util.isNumber(object)) {
             int number = ((GsNumber)object).getData();
             List<GsObject> newArrayData = new ArrayList<>();
 
@@ -282,11 +292,11 @@ public class Functions {
     private void decrement_uncons() {
         GsObject object = stack.pop();
 
-        if (object instanceof GsNumber) {
+        if (Util.isNumber(object)) {
             int number = ((GsNumber)object).getData();
             stack.push(new GsNumber(number - 1));
         }
-        else if (object instanceof GsArray) {
+        else if (Util.isArray(object)) {
             GsArray array = (GsArray)object;
             List<GsObject> arrayData = array.getData();
             GsObject leftObject = arrayData.get(0);
@@ -299,11 +309,11 @@ public class Functions {
     private void increment_rightUncons() {
         GsObject object = stack.pop();
 
-        if (object instanceof GsNumber) {
+        if (Util.isNumber(object)) {
             int number = ((GsNumber)object).getData();
             stack.push(new GsNumber(number + 1));
         }
-        else if (object instanceof GsArray) {
+        else if (Util.isArray(object)) {
             GsArray array = (GsArray)object;
             List<GsObject> arrayData = array.getData();
             GsObject leftObject = arrayData.get(arrayData.size() - 1);
@@ -327,7 +337,7 @@ public class Functions {
 
     private void print() {
         GsObject object = stack.pop();
-        if (object instanceof GsString) {
+        if (Util.isString(object)) {
             stack.push(object);
         }
         else {
@@ -354,7 +364,7 @@ public class Functions {
     private void rand() {
         GsObject object = stack.pop();
 
-        if (object instanceof GsNumber) {
+        if (Util.isNumber(object)) {
             int number = ((GsNumber)object).getData();
             int random = (int)(Math.random() * number);
             stack.push(new GsNumber(random));
@@ -364,7 +374,7 @@ public class Functions {
     private void doFunc() {
         GsObject object = stack.pop();
 
-        if (object instanceof GsBlock) {
+        if (Util.isBlock(object)) {
 
         }
     }
@@ -383,7 +393,7 @@ public class Functions {
                 condition = stack.pop();
 
         if (Util.truthy(condition)) {
-            if (ifTrue instanceof GsBlock) {
+            if (Util.isBlock(ifTrue)) {
                 //TODO: finish 'if' builtin
             }
             else {
@@ -398,7 +408,7 @@ public class Functions {
     private void abs() {
         GsObject object = stack.pop();
 
-        if (object instanceof GsNumber) {
+        if (Util.isNumber(object)) {
             int number = Math.abs(((GsNumber)object).getData());
             stack.push(new GsNumber(number));
         }

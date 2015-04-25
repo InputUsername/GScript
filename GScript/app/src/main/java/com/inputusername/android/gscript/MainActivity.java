@@ -66,6 +66,9 @@ public class MainActivity extends Activity {
 
     void runCode() {
         String code = getCodeEditText().getText().toString();
+        if (code.isEmpty()) {
+            return;
+        }
         String output = Interpreter.interpret(code);
 
         Intent intent = new Intent(this, OutputActivity.class);

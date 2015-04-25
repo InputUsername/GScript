@@ -43,9 +43,9 @@ public class Interpreter {
             // retrieve the value and handle it as normal. Then go to the next token.
             if (variables.containsKey(tokenString)) {
                 GsObject object = variables.get(tokenString);
-                if ((object instanceof GsNumber) || (object instanceof GsString) || (object instanceof GsArray)) {
+                if (Util.isNumber(object) || Util.isString(object) || Util.isArray(object)) {
                     stack.push(object);
-                } else if (object instanceof GsBlock) {
+                } else if (Util.isBlock(object)) {
                     String blockCode = ((GsBlock) object).getData();
                     interpretString(blockCode, functions, output, stack, variables, ++recursionDepth);
                 } else {
@@ -89,6 +89,9 @@ public class Interpreter {
             output.append(iterator.next().toString());
         }
 
+        if (output.length() == 0) {
+            return "";
+        }
         return output.substring(2);
     }
 

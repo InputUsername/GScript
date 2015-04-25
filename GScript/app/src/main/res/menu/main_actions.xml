@@ -8,4 +8,9 @@
         android:title="@string/action_clear_title"
         android:icon="@drawable/icon_clear"
         android:showAsAction="ifRoom" />
+    <item android:id="@+id/action_help"
+        android:title="@string/action_help_title"
+        android:icon="@drawable/icon_help"
+        android:showAsAction="ifRoom" />
+
 </menu>

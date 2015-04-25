@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity"
+    tools:menu="main_actions"
     android:nestedScrollingEnabled="false">
 
     <EditText
