@@ -1,5 +1,7 @@
 package com.inputusername.android.gscript.lang.types;
 
+import com.inputusername.android.gscript.lang.Util;
+
 import java.util.ArrayList;
 import java.util.List;
 

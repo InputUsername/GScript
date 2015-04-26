@@ -32,13 +32,14 @@ public class HelpActivity extends Activity {
         List<String> excludes = Arrays.asList("wait", "execute", "notify", "notifyAll");
 
         for (Method method : Functions.class.getMethods()) {
-            if (!method.isAnnotationPresent(Unimplemented.class)
-                    && method.getReturnType().equals(Void.TYPE)
-                    && !excludes.contains(method.getName())) {
+            if (method.getReturnType().equals(Void.TYPE) && !excludes.contains(method.getName())) {
                 textView.append("\n\n" + method.getName());
 
                 if (method.isAnnotationPresent(PartiallyImplemented.class)) {
-                    textView.append(" (partially)");
+                    textView.append("\n(partially implemented)");
+                }
+                else if (method.isAnnotationPresent(Unimplemented.class)) {
+                    textView.append("\n(unimplemented)");
                 }
             }
         }

@@ -9,6 +9,12 @@ import com.inputusername.android.gscript.lang.types.GsString;
 import java.util.List;
 
 public class Util {
+    private Util() {}
+
+    public static String escape(String string) {
+        return string;
+    }
+
     public static boolean truthy(GsObject object) {
         boolean truthy = true;
 
@@ -40,6 +46,10 @@ public class Util {
         return truthy;
     }
 
+    public static boolean sameClass(GsObject first, GsObject second) {
+        return first.getClass().equals(second.getClass());
+    }
+
     public static boolean isNumber(GsObject object) {
         return (object instanceof GsNumber);
     }
@@ -61,10 +71,72 @@ public class Util {
         return objects;
     }
 
+    private static Integer compare(GsObject first, GsObject second) {
+        Integer equality = null;
+
+        if (sameClass(first, second)) {
+            if (Util.isNumber(first)) {
+                int firstNumber = ((GsNumber)first).getData(),
+                        secondNumber = ((GsNumber)second).getData();
+
+                if (secondNumber < firstNumber) {
+                    equality = -1;
+                }
+                else if (secondNumber == firstNumber) {
+                    equality = 0;
+                }
+                else {
+                    equality = 1;
+                }
+            }
+            else if (Util.isString(first)) {
+                String firstString = ((GsString)first).getData(),
+                        secondString = ((GsString)second).getData();
+
+                equality = secondString.compareTo(firstString);
+            }
+            else if (Util.isBlock(first)) {
+                String firstBlock = ((GsBlock)first).getData(),
+                        secondBlock = ((GsBlock)second).getData();
+
+                equality = secondBlock.compareTo(firstBlock);
+            }
+            else if (Util.isArray(first)) {
+                List<GsObject> firstData = ((GsArray)first).getData(),
+                        secondData = ((GsArray)second).getData();
+
+                int firstSize = firstData.size(),
+                        secondSize = secondData.size();
+
+                if (firstSize == secondSize) {
+                    equality = 0;
+                    for (int i = 0; i < firstSize; ++i) {
+                        Integer comparison = compare(firstData.get(i), secondData.get(i));
+                        if (comparison == null) {
+                            equality = null;
+                            break;
+                        }
+                        else if (comparison.compareTo(0) < 0) {
+                            equality = -1;
+                            break;
+                        }
+                        else if (comparison.compareTo(0) > 0) {
+                            equality = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return equality;
+    }
+
+    /*
     public static boolean areEqual(GsObject first, GsObject second) {
         boolean equal = false;
 
-        if (first.getClass().equals(second.getClass())) {
+        if (sameClass(first, second) {
             if (Util.isNumber(first)) {
                 GsNumber firstNumber = (GsNumber)first,
                         secondNumber = (GsNumber)second;
@@ -109,5 +181,28 @@ public class Util {
         }
 
         return equal;
+    }
+    */
+
+    public static boolean areEqual(GsObject first, GsObject second) {
+        Integer comparison = compare(first, second);
+        if (comparison != null && comparison.equals(0)) {
+            return true;
+        }
+        return false;
+    }
+
+    // is first larger than second?
+    public static boolean isLarger(GsObject first, GsObject second) {
+        Integer comparison = compare(first, second);
+        if (comparison != null && comparison.equals(1)) {
+            return true;
+        }
+        return false;
+    }
+
+    // is first smaller than second?
+    public static boolean isSmaller(GsObject first, GsObject second) {
+        return isLarger(second, first);
     }
 }

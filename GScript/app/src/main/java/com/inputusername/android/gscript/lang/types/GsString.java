@@ -1,5 +1,7 @@
 package com.inputusername.android.gscript.lang.types;
 
+import com.inputusername.android.gscript.lang.Util;
+
 public class GsString implements GsObject {
     private String data;
 
@@ -12,6 +14,6 @@ public class GsString implements GsObject {
     }
 
     public String toString() {
-        return "\"" + data + "\"";
+        return "\"" + Util.escape(data) + "\"";
     }
 }

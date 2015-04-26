@@ -9,9 +9,6 @@ import com.inputusername.android.gscript.lang.types.GsString;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Eigenaar on 23-4-2015.
- */
 public class Functions {
 
     private Stack stack;
@@ -165,8 +162,9 @@ public class Functions {
         }
         else if (Util.isArray(object)) {
             List<GsObject> arrayData = ((GsArray)object).getData();
-            for (GsObject arrayObject : arrayData) {
-                stack.push(arrayObject);
+            int size = arrayData.size();
+            for (int i = size - 1; i > 0; --i) {
+                stack.push(arrayData.get(i));
             }
         }
     }
@@ -197,24 +195,72 @@ public class Functions {
 
     }
 
-    @Unimplemented
+    @PartiallyImplemented
     public void add_concat() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.sameClass(first, second)) {
+            if (Util.isNumber(first)) {
+                int firstNumber = ((GsNumber)first).getData(),
+                        secondNumber = ((GsNumber)second).getData();
+
+                int sum = firstNumber + secondNumber;
+                stack.push(new GsNumber(sum));
+            }
+        }
+        //TODO: finish concat
     }
 
-    @Unimplemented
+    @PartiallyImplemented
     public void subtract_setDiff() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.sameClass(first, second)) {
+            if (Util.isNumber(first)) {
+                int firstNumber = ((GsNumber)first).getData(),
+                        secondNumber = ((GsNumber)second).getData();
+
+                int difference = secondNumber - firstNumber;
+                stack.push(new GsNumber(difference));
+            }
+        }
+        //TODO: finish setDiff
     }
 
-    @Unimplemented
+    @PartiallyImplemented
     public void mult_blockExecuteTimes_arrayRepeat_join_fold() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.sameClass(first, second)) {
+            if (Util.isNumber(first)) {
+                int firstNumber = ((GsNumber)first).getData(),
+                        secondNumber = ((GsNumber)second).getData();
+
+                int product = firstNumber * secondNumber;
+                stack.push(new GsNumber(product));
+            }
+        }
+        //TODO: finish blockExecuteTimes_arrayRepeat_join_fold
     }
 
     @Unimplemented
     public void div_split_splitInGroupsOfSize_unfold_each() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.sameClass(first, second)) {
+            if (Util.isNumber(first)) {
+                int firstNumber = ((GsNumber)first).getData(),
+                        secondNumber = ((GsNumber)second).getData();
+
+                int quotient = secondNumber / firstNumber;
+                stack.push(new GsNumber(quotient));
+            }
+        }
+        //TODO: finish split_splitInGroupsOfSize_unfold_each
     }
 
     @PartiallyImplemented
@@ -312,14 +358,40 @@ public class Functions {
         stack.pop();
     }
 
-    @Unimplemented
+    @PartiallyImplemented
     public void lessThan_elementsLessThanIndex() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.sameClass(first, second)) {
+            if (Util.isSmaller(second, first)) {
+                stack.push(new GsNumber(1));
+            }
+            else {
+                stack.push(new GsNumber(0));
+            }
+        }
+        else {
+            //TODO: elements lass than index
+        }
     }
 
-    @Unimplemented
+    @PartiallyImplemented
     public void greaterThan_elementsGreaterThanOrEqualToIndex() {
+        GsObject first = stack.pop(),
+                second = stack.pop();
 
+        if (Util.sameClass(first, second)) {
+            if (Util.isLarger(second, first)) {
+                stack.push(new GsNumber(1));
+            }
+            else {
+                stack.push(new GsNumber(0));
+            }
+        }
+        else {
+            //TODO: elements greater than or equal index
+        }
     }
 
     @PartiallyImplemented
@@ -327,7 +399,7 @@ public class Functions {
         GsObject first = stack.pop(),
                 second = stack.pop();
 
-        if (first.getClass().equals(second.getClass())) {
+        if (Util.sameClass(first, second)) {
             if (Util.areEqual(first, second)) {
                 stack.push(new GsNumber(1));
             }
@@ -340,7 +412,7 @@ public class Functions {
         }
     }
 
-
+    @PartiallyImplemented
     public void range_size_select() {
         GsObject object = stack.pop();
 
@@ -354,9 +426,16 @@ public class Functions {
 
             stack.push(new GsArray(newArrayData));
         }
+        else if (Util.isArray(object)) {
+            List<GsObject> arrayData = ((GsArray)object).getData();
+            int size = arrayData.size();
+            stack.push(new GsNumber(size));
+        }
     }
 
+    @PartiallyImplemented
     public void dup() {
+        //TODO: deep copy of arrays
         stack.push(stack.peek());
     }
 
@@ -446,15 +525,14 @@ public class Functions {
 
     }
 
-    //region TODO: fix output and string escapes and such
     public void print() {
         GsObject object = stack.pop();
         if (Util.isString(object)) {
-            stack.push(object);
+            output.append(((GsString)object).getData());
         }
         else {
             GsString string = new GsString(object.toString());
-            stack.push(string);
+            output.append(string);
         }
     }
 
@@ -472,7 +550,6 @@ public class Functions {
         n();
         print();
     }
-    //endregion
 
     public void rand() {
         GsObject object = stack.pop();
@@ -503,7 +580,7 @@ public class Functions {
 
     }
 
-    @Unimplemented
+    @PartiallyImplemented
     public void ifFunc() {
         GsObject ifFalse = stack.pop(),
                 ifTrue = stack.pop(),
@@ -518,7 +595,12 @@ public class Functions {
             }
         }
         else {
-
+            if (Util.isBlock(ifFalse)) {
+                //TODO: finish 'if' builtin
+            }
+            else {
+                stack.push(ifFalse);
+            }
         }
     }
 

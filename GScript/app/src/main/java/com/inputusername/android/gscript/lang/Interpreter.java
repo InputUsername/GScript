@@ -1,19 +1,18 @@
 package com.inputusername.android.gscript.lang;
 
+import android.util.Log;
+
 import com.inputusername.android.gscript.lang.types.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class Interpreter {
     private final static int maxRecursionDepth = 50;
 
-    private static String interpretString(String code, Functions functions, StringBuilder output, Stack stack, Namespace variables, int recursionDepth) {
-        if (recursionDepth == maxRecursionDepth) {
-            //TODO: implement exceptions (max recursion depth)
-        }
-
-        ArrayList<Token> tokens = Tokenizer.tokenize(code);
+    private static String interpretString(String code, Functions functions, StringBuilder output, Stack stack, Namespace variables) {
+        List<Token> tokens = Tokenizer.tokenize(code);
         int tokenCount = tokens.size();
 
         for (int i = 0; i < tokenCount; ++i) {
@@ -43,14 +42,19 @@ public class Interpreter {
             // retrieve the value and handle it as normal. Then go to the next token.
             if (variables.containsKey(tokenString)) {
                 GsObject object = variables.get(tokenString);
+
                 if (Util.isNumber(object) || Util.isString(object) || Util.isArray(object)) {
                     stack.push(object);
-                } else if (Util.isBlock(object)) {
-                    String blockCode = ((GsBlock) object).getData();
-                    interpretString(blockCode, functions, output, stack, variables, ++recursionDepth);
-                } else {
-                    //TODO: implement exceptions (unknown object type)
                 }
+                else if (Util.isBlock(object)) {
+                    String blockCode = ((GsBlock) object).getData();
+                    Log.d("stack before block", stack.toString());
+                    Log.d("block code", blockCode);
+                    interpretString(blockCode, functions, output, stack, variables);
+                    Log.d("stack after block", stack.toString());
+                }
+
+                Log.d("stack after block (2)", stack.toString());
 
                 continue;
             }
@@ -92,6 +96,7 @@ public class Interpreter {
         if (output.length() == 0) {
             return "";
         }
+
         return output.substring(2);
     }
 
@@ -104,7 +109,7 @@ public class Interpreter {
         String result;
 
         try {
-            result = interpretString(program, functionsList, output, stack, variables, 0);
+            result = interpretString(program, functionsList, output, stack, variables);
         }
         catch (Exception e) {
             result = e.getMessage();
