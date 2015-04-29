@@ -7,18 +7,21 @@ import com.inputusername.android.gscript.lang.types.GsObject;
 import com.inputusername.android.gscript.lang.types.GsString;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Functions {
 
     private Stack stack;
     private StringBuilder output;
+    private Namespace variables;
 
     private int stackSize = 0;
 
-    public Functions(Stack stack, StringBuilder output) {
+    public Functions(Stack stack, StringBuilder output, Namespace variables) {
         this.stack = stack;
         this.output = output;
+        this.variables = variables;
     }
 
     public void execute(String builtIn) {
@@ -36,7 +39,7 @@ public class Functions {
                 rotate();
                 break;
             case "$":
-                stackIth_sortBy();
+                stackIth_sort_sortBy();
                 break;
             case "+":
                 add_concat();
@@ -158,7 +161,7 @@ public class Functions {
             stack.push(new GsNumber(~number));
         }
         else if (Util.isString(object) || Util.isBlock(object)) {
-            //TODO: string/block eval
+
         }
         else if (Util.isArray(object)) {
             List<GsObject> arrayData = ((GsArray)object).getData();
@@ -190,9 +193,30 @@ public class Functions {
         stack.push(second);
     }
 
-    @Unimplemented
-    public void stackIth_sortBy() {
+    @PartiallyImplemented
+    public void stackIth_sort_sortBy() {
+        GsObject object = stack.pop();
 
+        if (Util.isNumber(object)) {
+
+        }
+        else if (Util.isString(object)) {
+            String string = ((GsString)object).getData();
+            char[] chars = string.toCharArray();
+            Arrays.sort(chars);
+            String sortedString = new String(chars);
+            stack.push(new GsString(sortedString));
+        }
+        else if (Util.isArray(object)) {
+            List<GsObject> arrayData = ((GsArray)object).getData();
+            GsObject[] objects = (GsObject[])arrayData.toArray();
+            Arrays.sort(objects);
+            List<GsObject> newArray = Arrays.asList(objects);
+            stack.push(new GsArray(newArray));
+        }
+        else if (Util.isBlock(object)) {
+            //TODO: implement sortBy
+        }
     }
 
     @PartiallyImplemented
@@ -208,8 +232,36 @@ public class Functions {
                 int sum = firstNumber + secondNumber;
                 stack.push(new GsNumber(sum));
             }
+            else if (Util.isString(first)) {
+                String firstString = ((GsString)first).getData(),
+                        secondString = ((GsString)second).getData();
+
+                String concat = secondString + firstString;
+                stack.push(new GsString(concat));
+            }
+            else if (Util.isBlock(first)) {
+                String firstBlock = ((GsBlock)first).getData(),
+                        secondBlock = ((GsBlock)second).getData();
+
+                String concat = secondBlock + firstBlock;
+                stack.push(new GsBlock(concat));
+            }
+            else if (Util.isArray(first)) {
+                List<GsObject> firstArrayData = ((GsArray)first).getData(),
+                        secondArrayData = ((GsArray)second).getData();
+
+                List<GsObject> concat = new ArrayList<>(secondArrayData);
+                concat.addAll(firstArrayData);
+                stack.push(new GsArray(concat));
+            }
         }
-        //TODO: finish concat
+        else {
+            GsObject[] objects = new GsObject[] {first, second};
+            Util.coerce(objects);
+            stack.push(objects[1]);
+            stack.push(objects[0]);
+            //add_concat();
+        }
     }
 
     @PartiallyImplemented
@@ -255,6 +307,10 @@ public class Functions {
             if (Util.isNumber(first)) {
                 int firstNumber = ((GsNumber)first).getData(),
                         secondNumber = ((GsNumber)second).getData();
+
+                if (firstNumber == 0) {
+                    throw new ArithmeticException("Divide by zero");
+                }
 
                 int quotient = secondNumber / firstNumber;
                 stack.push(new GsNumber(quotient));
@@ -561,23 +617,67 @@ public class Functions {
         }
     }
 
-    @Unimplemented
     public void doFunc() {
         GsObject object = stack.pop();
 
         if (Util.isBlock(object)) {
-            //TODO: finish 'do' builtin
+            String blockCode = ((GsBlock)object).getData();
+            Functions functions = new Functions(stack, output, variables);
+            Interpreter.interpretString(blockCode, functions, output, stack, variables);
+            while (true) {
+                GsObject condition = stack.pop();
+                if (!Util.truthy(condition)) {
+                    break;
+                }
+                Interpreter.interpretString(blockCode, functions, output, stack, variables);
+            }
         }
     }
 
-    @Unimplemented
     public void whileFunc() {
+        GsObject condition = stack.pop();
 
+        if (Util.isBlock(condition)) {
+            GsObject body = stack.pop();
+
+            if (Util.isBlock(body)) {
+                String conditionCode = ((GsBlock)condition).getData(),
+                        bodyCode = ((GsBlock)body).getData();
+
+                Functions functions = new Functions(stack, output, variables);
+                while (true) {
+                    Interpreter.interpretString(conditionCode, functions, output, stack, variables);
+                    GsObject conditionValue = stack.pop();
+                    if (!Util.truthy(conditionValue)) {
+                        break;
+                    }
+                    Interpreter.interpretString(bodyCode, functions, output, stack, variables);
+                }
+            }
+        }
     }
 
-    @Unimplemented
     public void until() {
+        GsObject condition = stack.pop();
 
+        if (Util.isBlock(condition)) {
+            GsObject body = stack.pop();
+
+            if (Util.isBlock(body)) {
+                String conditionCode = ((GsBlock)condition).getData(),
+                        bodyCode = ((GsBlock)body).getData();
+
+                Functions functions = new Functions(stack, output, variables);
+                while (true) {
+                    Interpreter.interpretString(conditionCode, functions, output, stack, variables);
+                    GsObject conditionValue = stack.pop();
+                    if (Util.truthy(conditionValue)) {
+                        break;
+                    }
+                    Interpreter.interpretString(bodyCode, functions, output, stack, variables);
+                }
+            }
+        }
     }
 
     @PartiallyImplemented
@@ -586,21 +686,16 @@ public class Functions {
                 ifTrue = stack.pop(),
                 condition = stack.pop();
 
-        if (Util.truthy(condition)) {
-            if (Util.isBlock(ifTrue)) {
-                //TODO: finish 'if' builtin
-            }
-            else {
-                stack.push(ifTrue);
-            }
+        // The value is selected based on the truth value of the condition
+        GsObject clause = (Util.truthy(condition) ? ifTrue : ifFalse);
+
+        if (Util.isBlock(clause)) {
+            String blockCode = ((GsBlock)clause).getData();
+            Functions functions = new Functions(stack, output, variables);
+            Interpreter.interpretString(blockCode, functions, output, stack, variables);
         }
         else {
-            if (Util.isBlock(ifFalse)) {
-                //TODO: finish 'if' builtin
-            }
-            else {
-                stack.push(ifFalse);
-            }
+            stack.push(clause);
         }
     }
 

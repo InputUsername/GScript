@@ -66,11 +66,44 @@ public class Util {
         return (object instanceof GsArray);
     }
 
-    public static GsObject[] coerce(GsObject first, GsObject second) {
-        GsObject[] objects = new GsObject[2];
-        return objects;
+    private static int typeRank(GsObject object) {
+        if (isNumber(object)) {
+            return 0;
+        }
+        else if (isArray(object)) {
+            return 1;
+        }
+        else if (isString(object)) {
+            return 2;
+        }
+        else if (isBlock(object)) {
+            return 3;
+        }
+        return 0;
+    }
+    public static void coerce(GsObject[] objects) {
+        int highestRank = 0;
+
+        int length = objects.length;
+        for (int i = 0; i < length; ++i) {
+            int rank = typeRank(objects[i]);
+            if (rank > highestRank) {
+                highestRank = rank;
+            }
+        }
+        for (int i = 0; i < length; ++i) {
+            int rank = typeRank(objects[i]);
+            if (rank < highestRank) {
+                //TODO: finish coerce
+            }
+        }
     }
 
+    /*
+        first > second --> 1
+        first == second --> 0
+        first < second --> -1
+     */
     private static Integer compare(GsObject first, GsObject second) {
         Integer equality = null;
 
@@ -79,7 +112,7 @@ public class Util {
                 int firstNumber = ((GsNumber)first).getData(),
                         secondNumber = ((GsNumber)second).getData();
 
-                if (secondNumber < firstNumber) {
+                if (firstNumber < secondNumber) {
                     equality = -1;
                 }
                 else if (secondNumber == firstNumber) {
@@ -93,13 +126,13 @@ public class Util {
                 String firstString = ((GsString)first).getData(),
                         secondString = ((GsString)second).getData();
 
-                equality = secondString.compareTo(firstString);
+                equality = firstString.compareTo(secondString);
             }
             else if (Util.isBlock(first)) {
                 String firstBlock = ((GsBlock)first).getData(),
                         secondBlock = ((GsBlock)second).getData();
 
-                equality = secondBlock.compareTo(firstBlock);
+                equality = firstBlock.compareTo(secondBlock);
             }
             else if (Util.isArray(first)) {
                 List<GsObject> firstData = ((GsArray)first).getData(),

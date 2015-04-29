@@ -1,4 +1,4 @@
 package com.inputusername.android.gscript.lang.types;
 
-public interface GsObject {
+public interface GsObject extends Comparable<GsObject> {
 }

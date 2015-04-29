@@ -8,15 +8,22 @@ import java.util.List;
 
 public class Stack extends ArrayDeque<GsObject> {
 
-    @Override
-    public GsObject pop() {
+    public GsObject pop() throws StackEmptyException {
         if (!isEmpty()) {
             return super.pop();
         }
         else {
-            //TODO: implement exceptions (stack empty)
+            throw new StackEmptyException("Stack underflow");
         }
-        return null;
+    }
+
+    public GsObject peek() throws StackEmptyException {
+        if (!isEmpty()) {
+            return super.peek();
+        }
+        else {
+            throw new StackEmptyException("Stack underflow");
+        }
     }
 
 }
