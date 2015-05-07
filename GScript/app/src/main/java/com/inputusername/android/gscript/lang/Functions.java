@@ -428,7 +428,12 @@ public class Functions {
             }
         }
         else {
-            //TODO: elements lass than index
+            if (Util.isNumber(first) && !Util.isNumber(second)) {
+
+            }
+            else {
+
+            }
         }
     }
 
