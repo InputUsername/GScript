@@ -33,11 +33,12 @@ public class GsArray implements GsObject {
 
         for (int i = 0; i < size; ++i) {
             result.append(data.get(i).toString());
-            result.append(" ");
+            if (i != size - 1) {
+                result.append(" ");
+            }
         }
 
-        int resultLength = result.length();
-        result.replace(resultLength - 1, resultLength, "]");
+        result.append("]");
 
         return result.toString();
     }
